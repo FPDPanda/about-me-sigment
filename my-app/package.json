@@ -1,0 +1,44 @@
+{
+  "name": "my-app",
+  "version": "1.0.0",
+  "description": "sigment app start",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "npm run initial-copy && concurrently -n TSC,ESBUILD-CREATE,ESBUILD-WATCH,ASSETS   \"npm run build:dev\" \"npm run bundle:create\" \"npm run copy:assets:watch\"  \"npm run bundle:watch\"  ",
+    "build-serve-dist-withserve": "npm run build && serve dist -s -l 4000",
+    "build-serve-dist-withesbuild": "npm run build && esbuild --serve=8000 --servedir=dist",
+    "build": "npm run build:prod:nosource && npm run copy:assets:prod && npm run copy:html:prod",
+    "build:prod:nosource": " esbuild src/Main.ts --bundle --format=esm --minify  --outfile=dist/bundle.js",
+    "build:prod:withsource": " esbuild dist/Main.js --bundle  --splitting --format=esm --minify --sourcemap=linked --outdir=dist/js --entry-names=bundle --chunk-names=chunks/[name]-[hash]",
+    "build:dev": "tsc -w --preserveWatchOutput --outDir distdev --sourceMap",
+    "build:ts:prod": "tsc --outDir dist",
+    "build:ts:prod:nosource": "",
+    "initial-copy": "npm run copy:html && npm run copy:assets",
+    "copy:html": "cpx \"index.html\" distdev",
+    "copy:html:prod": "cpx \"index.html\" dist",
+    "copy:html:watch": "cpx \"index.html\" distdev --watch",
+    "copy:assets": "cpx \"src/assets/**/*\" distdev/assets",
+    "copy:assets:watch": "cpx \"src/assets/**/*\" distdev/assets --watch",
+    "copy:assets:prod": "cpx \"src/assets/**/*\" dist/assets",
+    "bundle:create": "esbuild src/Main.ts --bundle --outfile=distdev/bundle.js --sourcemap --watch",
+    "bundle:watch": "npm run serve:spa",
+    "serve": "set NODE_ENV=dev&& node app.js",
+    "serve:spa": "serve distdev -s -l 4000",
+    "serve:prod": "set NODE_ENV=production&& node app.js",
+    "serve:prod:unix": "NODE_ENV=production node app.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^4.17.1",
+    "sigment": "^1.3.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "cpx": "^1.5.0",
+    "esbuild": "^0.25.3",
+    "serve": "^14.2.4",
+    "typescript": "^5.8.3"
+  }
+}
